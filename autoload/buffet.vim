@@ -1,5 +1,25 @@
 let s:buffers = {}
 let s:buffer_ids = []
+let g:leftCircle  = ""
+let g:rightCircle = ""
+
+let g:defaultFileIcon = "\uf016"
+" if set to 1, use powerline separators in between buffers and tabs in the tabline
+
+" the character to be shown by the count of truncated buffers on the left.
+let g:buffet_left_trunc_icon = "\uf0a8"
+
+" the character to be shown by the count of truncated buffers on the right.
+let g:buffet_right_trunc_icon = "\uf0a9"
+
+"the character to be used for separating items in the tabline.
+let g:buffet_separator = "\\"
+
+" if set to 0, the tabline will only be shown if there is more than one buffer or tab open.
+let g:buffet_always_show_tabline = 0
+
+" if set to 1, show index before each buffer name. Index is useful for switching between buffers quickly.
+let g:buffet_show_index = 1
 
 " when the focus switches to another *unlisted* buffer, it does not appear in
 " the tabline, thus the tabline will list starting from the first buffer. For
@@ -258,8 +278,14 @@ function! s:GetTypeHighlight(type)
     return "%#" . g:buffet_prefix . a:type . "#"
 endfunction
 
+function! s:GetDoubleTypeHighlight(type1, type2)
+    return "%#" . g:buffet_prefix . a:type1 . a:type2 . "#"
+endfunction
+
 function! s:Render()
     let sep_len = s:Len(g:buffet_separator)
+    let sep_len = s:Len(g:buffet_separator)
+    let currentBufferId = bufnr("%")
 
     let tabs_count = tabpagenr("$")
     let tabs_len = (1 + s:Len(g:buffet_tab_icon) + 1 + sep_len) * tabs_count
@@ -279,6 +305,7 @@ function! s:Render()
         let left = elements[i]
         let elem = left
         let right = elements[i + 1]
+        let currentFile = fnamemodify(bufname("%"), ':t')
 
         if elem.type == "Tab"
             let render = render . "%" . elem.value . "T"
@@ -316,7 +343,71 @@ function! s:Render()
 
         let separator =  g:buffet_has_separator[left.type][right.type]
         let separator_hi = s:GetTypeHighlight(left.type . right.type)
-        let render = render . separator_hi . separator
+
+        hi SeparatorTab   guibg=none guifg=#fabd2f
+				hi TabSep guibg=#fabd2f guifg=#000000
+        hi BufferStartEnd guibg=none guifg=#5d4d7d
+        hi BufferStartEnd1 guibg=none guifg=#242b38
+        hi BufferStartEnd2 guibg=none guifg=#504945
+				hi BufferMixed guibg=#5d4d7d guifg=#fabd2f
+				hi BufferMixed1 guibg=#242b38  guifg=#fabd2f
+				hi BufferMixed2 guibg=#504945   guifg=#fabd2f
+				hi BuffetBufferActiveBuffer guibg=#242b38 guifg=#504945
+				hi BuffetActiveBufferBuffer guibg=#504945 guifg=#242b38
+				hi BuffetActiveBufferCurrentBuffer guibg=#504945 guifg=#5d4d7d
+				hi BuffetCurrentBufferActiveBuffer guibg=#5d4d7d guifg=#504945
+				hi BuffetCurrentBufferBuffer guibg=#5d4d7d guifg=#242b38
+				hi BuffetBufferCurrentBuffer guibg=#242b38 guifg=#5d4d7d
+
+        " Custom tab icon
+        if elem.type == "Tab" && has("nvim")
+						if len(elements)>i+1
+							if right.type == "CurrentBuffer"
+								let render = "%#SeparatorTab#" . render . "%#BufferMixed#" . g:rightCircle
+							elseif right.type == "Buffer"
+								let render = "%#SeparatorTab#" . render . "%#BufferMixed1#" . g:rightCircle
+							elseif right.type == "Tab"
+								let render = "%#SeparatorTab#" . render . "%#TabSep#" . "/"
+							elseif len(elements) == i + 2
+								let render = "%#SeparatorTab#" . render . "%#SeparatorTab#" . g:rightCircle
+							else
+								let render = "%#SeparatorTab#" . render . "%#BufferMixed2#" . g:rightCircle
+							endif
+						endif
+        " Standard buffer
+        elseif s:IsBufferElement(elem) && has("nvim")
+            " Last buffer, close with ''
+            if elem.index == len(elements) - 2
+							if elem.type == "CurrentBuffer"
+                let render = render . "%#BufferStartEnd#" . g:rightCircle
+							elseif elem.type == "Buffer"
+                let render = render . "%#BufferStartEnd1#" . g:rightCircle
+							else
+                let render = render . "%#BufferStartEnd2#" . g:rightCircle
+							endif
+						elseif right.type == "Tab"
+								let render = render
+						else
+							if elem.index % 2 == 0
+									if elem.type == right.type
+										let sep = "/"
+										let hili = s:GetTypeHighlight(elem.type)
+									else
+										let sep = g:rightCircle
+										let hili = s:GetDoubleTypeHighlight(right.type, elem.type)
+									endif
+							else
+									if elem.type == right.type
+										let sep = "\\"
+										let hili = s:GetTypeHighlight(elem.type)
+									else
+										let sep = g:leftCircle
+										let hili = s:GetDoubleTypeHighlight(elem.type, right.type)
+									endif
+							endif
+						let render = render . hili . sep
+            endif
+        endif
 
         if elem.type == "Tab" && has("nvim")
             let render = render . "%T"
@@ -329,7 +420,7 @@ function! s:Render()
         let render = render . "%T"
     endif
 
-    let render = render . s:GetTypeHighlight("Buffer")
+    let render = render . s:GetTypeHighlight("BufferModCenter")
 
     return render
 endfunction

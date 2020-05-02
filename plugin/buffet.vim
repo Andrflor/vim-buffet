@@ -25,8 +25,8 @@ if get(g:, "buffet_powerline_separators", 0)
     let g:buffet_separator = "\ue0b1"
 else
     let g:buffet_powerline_separators = 0
-    let g:buffet_noseparator = get(g:, "buffet_noseparator", " ")
-    let g:buffet_separator = get(g:, "buffet_separator", "|")
+    let g:buffet_noseparator = get(g:, "buffet_noseparator", "")
+    let g:buffet_separator = get(g:, "buffet_separator", "/")
 endif
 
 let g:buffet_show_index = get(g:, "buffet_show_index", 1)
@@ -154,15 +154,15 @@ function! s:SetColors()
     " Issue: https://github.com/bagrat/vim-buffet/issues/5
     " if get(g:, "buffet_match_color_scheme", 1)
 
-    hi! BuffetCurrentBuffer cterm=NONE ctermbg=106 ctermfg=8 guibg=#b8bb26 guifg=#000000
-    hi! BuffetTrunc cterm=bold ctermbg=10 ctermfg=8 guibg=##999999 guifg=#000000
-    hi! BuffetTab cterm=NONE ctermbg=203 ctermfg=8 guibg=#FF5555 guifg=#000000
+    hi! BuffetCurrentBuffer cterm=NONE ctermbg=106 ctermfg=8 guibg=#5d4d7d guifg=#ffffff
+    hi! BuffetTrunc cterm=bold ctermbg=10 ctermfg=8 guibg=#999999 guifg=#000000
+    hi! BuffetTab cterm=NONE ctermbg=203 ctermfg=8 guibg=#fabd2f guifg=#000000
     hi! BuffetActiveBuffer cterm=NONE ctermbg=10 ctermfg=239 guibg=#504945 guifg=#000000
-    hi! BuffetBuffer cterm=NONE  ctermfg=10 guibg=buffermidcolor guifg=#504945
+    hi! BuffetBuffer cterm=NONE ctermfg=10 guibg=#242b38 guifg=#ff8800
 
     hi! link BuffetModCurrentBuffer BuffetCurrentBuffer
     hi! link BuffetModActiveBuffer BuffetActiveBuffer
-    hi! link BuffetModBuffer BuffetBuffer
+    hi! BuffetModCenter cterm=NONE ctermfg=10 guibg=none guifg=#ff8800
 
 
     hi! link BuffetLeftTrunc BuffetTrunc
@@ -201,7 +201,7 @@ function! s:SetColors()
             else
                 let g:buffet_has_separator[left][right] = g:buffet_separator
 
-                call s:LinkHi(sep_hi, left_hi)
+                " call s:LinkHi(sep_hi, left_hi)
             endif
         endfor
     endfor
