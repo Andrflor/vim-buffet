@@ -1,3 +1,4 @@
+
 let s:buffers = {}
 let s:buffer_ids = []
 let g:leftCircle  = ""
@@ -388,22 +389,15 @@ function! s:Render()
 						elseif right.type == "Tab"
 								let render = render
 						else
-							if elem.index % 2 == 0
-									if elem.type == right.type
-										let sep = "/"
-										let hili = s:GetTypeHighlight(elem.type)
-									else
-										let sep = g:rightCircle
-										let hili = s:GetDoubleTypeHighlight(right.type, elem.type)
-									endif
+							if elem.type == right.type
+								let sep = "|"
+								let hili = s:GetTypeHighlight(elem.type)
+							elseif elem.index % 2 == 0
+								let sep = g:rightCircle
+								let hili = s:GetDoubleTypeHighlight(right.type, elem.type)
 							else
-									if elem.type == right.type
-										let sep = "\\"
-										let hili = s:GetTypeHighlight(elem.type)
-									else
-										let sep = g:leftCircle
-										let hili = s:GetDoubleTypeHighlight(elem.type, right.type)
-									endif
+								let sep = g:leftCircle
+								let hili = s:GetDoubleTypeHighlight(elem.type, right.type)
 							endif
 						let render = render . hili . sep
             endif
