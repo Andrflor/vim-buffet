@@ -312,7 +312,7 @@ function! s:Render()
             let render = render . "%" . elem.value . "T"
         elseif s:IsBufferElement(elem) && has("nvim")
 				if match(elem.value, "\[0-9]......") >= 0
-					let elem.value = substitute(elem.value, "\[0-9].....\[0-9]*", "", "")
+					let elem.value = substitute(elem.value, "\[0-9].....\[0-9]*", "", ""). ""
 				endif
             let render = render . "%" . elem.buffer_id . "@SwitchToBuffer@"
         endif
