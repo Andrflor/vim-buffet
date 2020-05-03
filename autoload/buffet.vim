@@ -311,6 +311,9 @@ function! s:Render()
         if elem.type == "Tab"
             let render = render . "%" . elem.value . "T"
         elseif s:IsBufferElement(elem) && has("nvim")
+				if match(elem.value, "\[0-9]......") >= 0
+					let elem.value = substitute(elem.value, "\[0-9].....\[0-9]*", "", "")
+				endif
             let render = render . "%" . elem.buffer_id . "@SwitchToBuffer@"
         endif
 
